@@ -2,6 +2,9 @@ pipeline {
     agent none
     options {
         skipStagesAfterUnstable()
+        polling {
+            cron('*/2 * * * *')
+        }
     }
     stages {
         stage('Build') {
