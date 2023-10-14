@@ -25,7 +25,7 @@ node {
             }
         }
     }
-    stage('Deliver') {
+    stage('Deploy') {
         node {
             checkout scm
         }
