@@ -31,18 +31,13 @@ pipeline {
             }
         }
         stage('Manual Approval') {
-            agent any
             steps {
                 script {
-                    def userInput = input(
-                        id: 'Deploy_Approval',
-                        message: 'Lanjutkan ke tahap Deploy?',
-                        parameters: [choice(name: 'Choice', choices: 'Proceed\nAbort', description: 'Pilih Proceed untuk melanjutkan atau Abort untuk menghentikan pipeline')]
-                    )
+                    def userInput = input(message: 'Proceed to the Deploy stage?', ok: 'Proceed', fail: 'Abort')
                     if (userInput == 'Proceed') {
-                        currentBuild.result = 'CONTINUE'
+                        currentBuild.displayName = "Deploy"
                     } else {
-                        error('Pipeline dihentikan oleh pengguna')
+                        error("Pipeline execution aborted by the user.")
                     }
                 }
             }
@@ -56,7 +51,7 @@ pipeline {
             steps {
                 dir(path: env.BUILD_ID) {
                     unstash(name: 'compiled-results')
-                    sh "docker run -t --rm -v ${VOLUME} ${IMAGE} pyinstaller -F /src/add2vals.py /src/calc.py"
+                    sh "docker run --rm -v ${VOLUME} ${IMAGE} 'pyinstaller -F add2vals.py'"
                 }
                 script {
                     currentBuild.result = 'SUCCESS' // Menandai bahwa aplikasi telah berhasil dideploy
