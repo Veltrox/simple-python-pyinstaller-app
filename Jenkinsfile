@@ -5,6 +5,7 @@ pipeline {
     }
     stages {
         stage('Build') {
+            // Kode Build stage
             agent {
                 docker {
                     image 'python:3.12.0-alpine3.18'
@@ -16,6 +17,7 @@ pipeline {
             }
         }
         stage('Test') {
+            // Kode Test stage
             agent {
                 docker {
                     image 'qnib/pytest'
@@ -35,8 +37,9 @@ pipeline {
             steps {
                 script {
                     def userInput = input(
-                        id: 'userInput', message: 'Lanjutkan ke tahap Deploy?',
-                        parameters: [choice(name: 'Proceed', choices: 'Proceed\nAbort', description: 'Pilih Proceed untuk melanjutkan atau Abort untuk menghentikan pipeline', defaultValue: 'Abort')]
+                        id: 'Deploy_Approval',
+                        message: 'Lanjutkan ke tahap Deploy?',
+                        parameters: [choice(name: 'Choice', choices: 'Proceed\nAbort', description: 'Pilih Proceed untuk melanjutkan atau Abort untuk menghentikan pipeline')]
                     )
                     if (userInput == 'Proceed') {
                         currentBuild.result = 'CONTINUE'
@@ -47,15 +50,17 @@ pipeline {
             }
         }
         stage('Deliver') {
+            // Kode Deliver stage
             agent any
             environment {
                 VOLUME = '$(pwd)/sources:/src'
                 IMAGE = 'cdrx/pyinstaller-linux:python2'
             }
             steps {
-                dir(path: "${env.BUILD_ID}") {
+                // Kode langkah-langkah Deliver stage
+                dir(path: env.BUILD_ID) {
                     unstash(name: 'compiled-results')
-                    sh "docker run --rm -v ${VOLUME} ${IMAGE} pyinstaller -F add2vals.py"
+                    sh "docker run --rm -v ${VOLUME} ${IMAGE} 'pyinstaller -F add2vals.py'"
                 }
                 script {
                     currentBuild.result = 'SUCCESS' // Menandai bahwa aplikasi telah berhasil dideploy
@@ -63,11 +68,11 @@ pipeline {
             }
             post {
                 success {
-                    archiveArtifacts artifacts: "${env.BUILD_ID}/sources/dist/add2vals", onlyIfSuccessful: true
-                    sh "docker run --rm -v ${VOLUME} ${IMAGE} rm -rf build dist"
+                    archiveArtifacts "${env.BUILD_ID}/sources/dist/add2vals"
+                    sh "docker run --rm -v ${VOLUME} ${IMAGE} 'rm -rf build dist'"
                     echo 'Aplikasi berhasil di-deploy. Akan menjalankan selama 1 menit sebelum otomatis berakhir.'
                     script {
-                        sleep time: 1, unit: 'MINUTES' // Menunggu selama 1 menit
+                        sleep 1 * 60 // Menunggu selama 1 menit
                     }
                 }
                 always {
