@@ -5,7 +5,6 @@ pipeline {
     }
     stages {
         stage('Build') {
-            // Kode Build stage
             agent {
                 docker {
                     image 'python:3.12.0-alpine3.18'
@@ -17,7 +16,6 @@ pipeline {
             }
         }
         stage('Test') {
-            // Kode Test stage
             agent {
                 docker {
                     image 'qnib/pytest'
@@ -50,22 +48,20 @@ pipeline {
             }
         }
         stage('Deliver') {
-            // Kode Deliver stage
             agent any
             environment {
                 VOLUME = '$(pwd)/sources:/src'
                 IMAGE = 'cdrx/pyinstaller-linux:python2'
             }
             steps {
-            // ... kode langkah-langkah sebelumnya ...
-            dir(path: env.BUILD_ID) {
-                unstash(name: 'compiled-results')
-                sh "docker run -t --rm -v ${VOLUME} ${IMAGE} pyinstaller -F /src/add2vals.py"
+                dir(path: env.BUILD_ID) {
+                    unstash(name: 'compiled-results')
+                    sh "docker run -t --rm -v ${VOLUME} ${IMAGE} pyinstaller -F /src/add2vals.py /src/calc.py"
+                }
+                script {
+                    currentBuild.result = 'SUCCESS' // Menandai bahwa aplikasi telah berhasil dideploy
+                }
             }
-            script {
-                currentBuild.result = 'SUCCESS' // Menandai bahwa aplikasi telah berhasil dideploy
-            }
-        }
             post {
                 success {
                     archiveArtifacts "${env.BUILD_ID}/sources/dist/add2vals"
