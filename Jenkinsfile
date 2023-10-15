@@ -53,9 +53,9 @@ pipeline {
                 IMAGE = 'cdrx/pyinstaller-linux:python2'
             }
             steps {
-                dir(path: env.BUILD_ID) {
+                dir(path: "${env.BUILD_ID}") {
                     unstash(name: 'compiled-results')
-                    sh "docker run --rm -v ${VOLUME} ${IMAGE} 'pyinstaller -F add2vals.py'"
+                    sh "docker run --rm -v ${VOLUME} ${IMAGE} pyinstaller -F add2vals.py"
                 }
                 script {
                     currentBuild.result = 'SUCCESS' // Menandai bahwa aplikasi telah berhasil dideploy
@@ -63,11 +63,11 @@ pipeline {
             }
             post {
                 success {
-                    archiveArtifacts "${env.BUILD_ID}/sources/dist/add2vals"
-                    sh "docker run --rm -v ${VOLUME} ${IMAGE} 'rm -rf build dist'"
+                    archiveArtifacts artifacts: "${env.BUILD_ID}/sources/dist/add2vals", onlyIfSuccessful: true
+                    sh "docker run --rm -v ${VOLUME} ${IMAGE} rm -rf build dist"
                     echo 'Aplikasi berhasil di-deploy. Akan menjalankan selama 1 menit sebelum otomatis berakhir.'
                     script {
-                        sleep 1 * 60 // Menunggu selama 1 menit
+                        sleep time: 1, unit: 'MINUTES' // Menunggu selama 1 menit
                     }
                 }
                 always {
