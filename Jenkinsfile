@@ -58,14 +58,14 @@ pipeline {
             }
             steps {
             // ... kode langkah-langkah sebelumnya ...
-                dir(path: env.BUILD_ID) {
+            dir(path: env.BUILD_ID) {
                 unstash(name: 'compiled-results')
-                sh "docker run -t --rm -v ${VOLUME} ${IMAGE} pyinstaller -F add2vals.py"
+                sh "docker run -t --rm -v ${VOLUME} ${IMAGE} pyinstaller -F /src/add2vals.py"
             }
             script {
-            currentBuild.result = 'SUCCESS' // Menandai bahwa aplikasi telah berhasil dideploy
-                }
+                currentBuild.result = 'SUCCESS' // Menandai bahwa aplikasi telah berhasil dideploy
             }
+        }
             post {
                 success {
                     archiveArtifacts "${env.BUILD_ID}/sources/dist/add2vals"
