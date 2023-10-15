@@ -30,6 +30,22 @@ pipeline {
                 }
             }
         }
+        stage('Manual Approval') {
+            agent any
+            steps {
+                script {
+                    def userInput = input(
+                        id: 'userInput', message: 'Lanjutkan ke tahap Deploy?',
+                        parameters: [choice(name: 'Proceed', choices: 'Proceed\nAbort', description: 'Pilih Proceed untuk melanjutkan atau Abort untuk menghentikan pipeline', defaultValue: 'Abort')]
+                    )
+                    if (userInput == 'Proceed') {
+                        currentBuild.result = 'CONTINUE'
+                    } else {
+                        error('Pipeline dihentikan oleh pengguna')
+                    }
+                }
+            }
+        }
         stage('Deliver') {
             agent any
             environment {
