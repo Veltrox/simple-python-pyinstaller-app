@@ -57,13 +57,13 @@ pipeline {
                 IMAGE = 'cdrx/pyinstaller-linux:python2'
             }
             steps {
-                // Kode langkah-langkah Deliver stage
+            // ... kode langkah-langkah sebelumnya ...
                 dir(path: env.BUILD_ID) {
-                    unstash(name: 'compiled-results')
-                    sh "docker run --rm -v ${VOLUME} ${IMAGE} 'pyinstaller -F add2vals.py'"
-                }
-                script {
-                    currentBuild.result = 'SUCCESS' // Menandai bahwa aplikasi telah berhasil dideploy
+                unstash(name: 'compiled-results')
+                sh "docker run -t --rm -v ${VOLUME} ${IMAGE} pyinstaller -F add2vals.py"
+            }
+            script {
+            currentBuild.result = 'SUCCESS' // Menandai bahwa aplikasi telah berhasil dideploy
                 }
             }
             post {
