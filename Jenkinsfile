@@ -30,19 +30,7 @@ pipeline {
                 }
             }
         }
-        stage('Manual Approval') {
-            steps {
-                script {
-                    def userInput = input(message: 'Proceed to the Deploy stage?', ok: 'Proceed', fail: 'Abort')
-                    if (userInput == 'Proceed') {
-                        currentBuild.displayName = "Deploy"
-                    } else {
-                        error("Pipeline execution aborted by the user.")
-                    }
-                }
-            }
-        }
-        stage('Deliver') {
+        stage('Deploy') {
             agent any
             environment {
                 VOLUME = '$(pwd)/sources:/src'
