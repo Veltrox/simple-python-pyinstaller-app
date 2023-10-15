@@ -33,7 +33,10 @@ pipeline {
         stage('Manual Approval') {
             steps {
                 script {
-                    def userInput = input(message: 'Lanjutkan ke tahap Deploy?', ok: 'Proceed', submitter: 'admin')
+                    def userInput = input(
+                        id: 'userInput', message: 'Lanjutkan ke tahap Deploy?',
+                        parameters: [choice(name: 'action', choices: 'Proceed\nAbort', description: 'Proceed or Abort')]
+                    )
                     if (userInput == 'Proceed') {
                         currentBuild.result = 'SUCCESS'
                     } else {
