@@ -30,6 +30,18 @@ pipeline {
                 }
             }
         }
+        stage('Manual Approval') {
+            steps {
+                script {
+                    def userInput = input(message: 'Lanjutkan ke tahap Deploy?', ok: 'Proceed', submitter: 'admin')
+                    if (userInput == 'Proceed') {
+                        currentBuild.result = 'SUCCESS'
+                    } else {
+                        currentBuild.result = 'ABORTED'
+                    }
+                }
+            }
+        }
         stage('Deploy') {
             agent any
             environment {
