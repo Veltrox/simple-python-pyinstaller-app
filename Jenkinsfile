@@ -57,7 +57,7 @@ pipeline {
                     sh "docker run --rm -v ${VOLUME} ${IMAGE} 'pyinstaller -F add2vals.py'"
                 }
                 script {
-                    currentBuild.result = 'SUCCESS' // Menandai bahwa aplikasi telah berhasil dideploy
+                    currentBuild.result = 'SUCCESS' // Aplikasi Berhasil di-deploy
                 }
             }
             post {
@@ -66,12 +66,12 @@ pipeline {
                     sh "docker run --rm -v ${VOLUME} ${IMAGE} 'rm -rf build dist'"
                     echo 'Aplikasi berhasil di-deploy. Akan menjalankan selama 1 menit sebelum otomatis berakhir.'
                     script {
-                        sleep 1 * 60 // Menunggu selama 1 menit
+                        sleep 1 * 60 // Wait 1 menit
                     }
                 }
                 always {
                     script {
-                        currentBuild.result = 'SUCCESS' // Memastikan bahwa eksekusi pipeline berhasil
+                        currentBuild.result = 'SUCCESS' // Tanda Eksekusi Berhasil
                     }
                 }
             }
